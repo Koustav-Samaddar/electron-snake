@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, session } = require('electron')
 
 let win
 
@@ -9,6 +9,10 @@ function createWindow () {
     height: 600,
     frame: false,
     resizable: false,
+
+    webPreferences: {
+      nodeIntegration: true,
+    },
   })
 
   // and load the index.html of the app.
@@ -23,6 +27,15 @@ function createWindow () {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     win = null
+  })
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': ['script-src \'self\'']
+      }
+    })
   })
 }
 
