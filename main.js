@@ -1,4 +1,5 @@
 const { app, BrowserWindow, session } = require('electron')
+const { WIDTH, HEIGHT, DEBUG } = require('./game.js')
 
 let win
 
@@ -19,7 +20,8 @@ function createWindow () {
   win.loadFile('index.html')
 
   // Open the DevTools.
-  win.webContents.openDevTools()
+  if (DEBUG)
+    win.webContents.openDevTools()
 
   // Emitted when the window is closed.
   win.on('closed', () => {
