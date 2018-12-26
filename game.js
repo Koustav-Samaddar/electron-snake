@@ -3,7 +3,7 @@ const Mousetrap = require('mousetrap')
 const WIDTH = 800
 const HEIGHT = 600
 const SPEED = 1
-const DEBUG = true
+const DEBUG = false
 
 let ctx
 const objs = {}
@@ -49,16 +49,50 @@ function gameInit() {
   keystate.hor  = 0
 
   // Initialising player object
-  objs.player = {
-    'shape': 'circle',
-    'draw': drawCircle,
-    'drawArgs': [WIDTH/2, HEIGHT/2, 5, 'blue', true],
+  objs.spectator = {
+    'posx': WIDTH / 2,
+    'posy': HEIGHT / 2,
+    'size': 5,
+
+    'draw': () => {
+      drawCircle(
+        objs.spectator.posx, objs.spectator.posy, 
+        objs.spectator.size, 'grey', false
+      )
+    },
+  }
+
+  // TODO: Make snake object
+  objs.snake = {
+    'posx': [50],
+    'posy': [50],
+    'size': 5,
+
+    'tick': (nposx, nposy) => {
+      objs.snake.posx.shift()
+      objs.snake.posx.push(nposx)
+      objs.snake.posy.shift()
+      objs.snake.posy.push(nposy)
+    },
+
+    'grow': (nposx, nposy) => {
+      objs.snake.posx.push(nposx)
+      objs.snake.posy.push(nposy)
+    },
+
+    'draw': () => {
+      for (let i = 0; i < objs.snake.posx.length; ++i) {
+        drawCircle(
+          objs.snake.posx[i], objs.snake.posy[i], 
+          objs.snake.size, 'green', false
+        )
+      }
+    },
   }
 }
 
 function gameLoop() {
   // Main game loop
-  const timer = process.hrtime()
 
   // Handling user input
   Mousetrap.bind('up', () => { keystate.ver-- })
@@ -74,22 +108,21 @@ function gameLoop() {
   }
 
   // Updating player object
-  objs.player.drawArgs[0] += (SPEED * keystate.hor)
-  objs.player.drawArgs[1] += (SPEED * keystate.ver)
+  objs.spectator.posx += (SPEED * keystate.hor)
+  objs.spectator.posy += (SPEED * keystate.ver)
 
   // TODO: Update game objects
 
   // Clearing screen
-  drawRectangle(0, 0, WIDTH, HEIGHT, 'black', true)
+  drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
 
   // Drawing all objects
   for (let obj in objs) {
-    objs[obj].draw(...objs[obj].drawArgs)
+    objs[obj].draw()
   }
 
   // Looping back
-  const elapsed = process.hrtime(timer)[1] / 1000000
-  setTimeout(gameLoop, 16 - elapsed)
+  setTimeout(gameLoop, 10)
 }
 
 function gameMain() {
