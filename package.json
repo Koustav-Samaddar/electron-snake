@@ -1,0 +1,15 @@
+{
+  "name": "electron-game",
+  "version": "0.1.0",
+  "description": "My attempt at learning how to use electron by making a simple game",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Koustav Samaddar",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^4.0.0"
+  }
+}
