@@ -160,28 +160,37 @@ function gameLoop() {
 
   // Handling user input
   Mousetrap.bind('up', () => {
-    keystate.up = true
-    keystate.down = false
-    keystate.left = false
-    keystate.right = false
+    if (!keystate.down)
+    {
+      keystate.up = true
+      keystate.down = false
+      keystate.left = false
+      keystate.right = false
+    }
   })
   Mousetrap.bind('down', () => {
-    keystate.up = false
-    keystate.down = true
-    keystate.left = false
-    keystate.right = false
+    if (!keystate.up) {
+      keystate.up = false
+      keystate.down = true
+      keystate.left = false
+      keystate.right = false
+    }
   })
   Mousetrap.bind('left', () => {
-    keystate.up = false
-    keystate.down = false
-    keystate.left = true
-    keystate.right = false
+    if (!keystate.right) {
+      keystate.up = false
+      keystate.down = false
+      keystate.left = true
+      keystate.right = false
+    }
   })
   Mousetrap.bind('right', () => {
-    keystate.up = false
-    keystate.down = false
-    keystate.left = false
-    keystate.right = true
+    if (!keystate.left) {
+      keystate.up = false
+      keystate.down = false
+      keystate.left = false
+      keystate.right = true
+    }
   })
   Mousetrap.bind('space', () => {
     keystate.paused = !keystate.paused
