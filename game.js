@@ -50,6 +50,7 @@ function gameInit() {
   keystate.left = false
   keystate.right = false
   keystate.paused = false
+  keystate.pressed = false
 
   // Initialising snake object
   objs.snake = {
@@ -128,11 +129,15 @@ function gameInit() {
     },
 
     'draw': () => {
-      for (let i = 0; i < objs.snake.posx.length; ++i) {
+      let drawSize = objs.snake.size / 2
+      for (let i = objs.snake.posx.length - 1; i >= 0; --i) {
         drawCircle(
           objs.snake.posx[i], objs.snake.posy[i], 
-          objs.snake.size / 2, 'green', false
+          drawSize, 'green', false
         )
+
+        if (i == objs.snake.posx.length - 1)
+          --drawSize
       }
     },
   }
@@ -161,40 +166,47 @@ function gameLoop() {
 
   // Handling user input
   Mousetrap.bind('up', () => {
-    if (!keystate.down)
+    if (!keystate.down && !keystate.pressed)
     {
       keystate.up = true
       keystate.down = false
       keystate.left = false
       keystate.right = false
+      keystate.pressed = true
     }
   })
   Mousetrap.bind('down', () => {
-    if (!keystate.up) {
+    if (!keystate.up && !keystate.pressed) {
       keystate.up = false
       keystate.down = true
       keystate.left = false
       keystate.right = false
+      keystate.pressed = true
     }
   })
   Mousetrap.bind('left', () => {
-    if (!keystate.right) {
+    if (!keystate.right && !keystate.pressed) {
       keystate.up = false
       keystate.down = false
       keystate.left = true
       keystate.right = false
+      keystate.pressed = true
     }
   })
   Mousetrap.bind('right', () => {
-    if (!keystate.left) {
+    if (!keystate.left && !keystate.pressed) {
       keystate.up = false
       keystate.down = false
       keystate.left = false
       keystate.right = true
+      keystate.pressed = true
     }
   })
   Mousetrap.bind('space', () => {
-    keystate.paused = !keystate.paused
+    if (!keystate.pressed)
+    {
+      keystate.paused = !keystate.paused
+    }
   })
 
   if (!keystate.paused) {
@@ -227,6 +239,8 @@ function gameLoop() {
         objs.snake.move(1, 0)
       }
     }
+
+    keystate.pressed = false
 
     // Clearing screen
     drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
