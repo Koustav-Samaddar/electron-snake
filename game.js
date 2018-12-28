@@ -49,6 +49,7 @@ function gameInit() {
   keystate.down = false
   keystate.left = false
   keystate.right = false
+  keystate.paused = false
 
   // Initialising snake object
   objs.snake = {
@@ -172,28 +173,33 @@ function gameLoop() {
     keystate.left = false
     keystate.right = true
   })
+  Mousetrap.bind('space', () => {
+    keystate.paused = !keystate.paused
+  })
 
-  // Updating spectator object
-  if (keystate.up) {
-    // objs.spectator.posy -= SPEED
-    objs.snake.move(0, -1)
-  }
-  if (keystate.down) {
-    objs.snake.move(0, 1)
-  }
-  if (keystate.left) {
-    objs.snake.move(-1, 0)
-  }
-  if (keystate.right) {
-    objs.snake.move(1, 0)
-  }
+  if (!keystate.paused) {
+    // Updating spectator object
+    if (keystate.up) {
+      // objs.spectator.posy -= SPEED
+      objs.snake.move(0, -1)
+    }
+    if (keystate.down) {
+      objs.snake.move(0, 1)
+    }
+    if (keystate.left) {
+      objs.snake.move(-1, 0)
+    }
+    if (keystate.right) {
+      objs.snake.move(1, 0)
+    }
 
-  // Clearing screen
-  drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
+    // Clearing screen
+    drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
 
-  // Drawing all objects
-  for (let obj in objs) {
-    objs[obj].draw()
+    // Drawing all objects
+    for (let obj in objs) {
+      objs[obj].draw()
+    }
   }
 
   // Looping back
