@@ -7,7 +7,7 @@ function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: WIDTH,
-    height: HEIGHT + 25,  // +25 is to account for frame
+    height: HEIGHT + 25 + 45,  // +25 is to account for frame
     // frame: false,
     resizable: false,
 
