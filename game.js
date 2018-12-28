@@ -124,6 +124,7 @@ function gameInit() {
         objs.snake.posx.push(dposx)
         objs.snake.posy.push(dposy)
       }
+      objs.food.generate()
     },
 
     'draw': () => {
@@ -142,8 +143,8 @@ function gameInit() {
     'size': 8,
 
     'generate': () => {
-      objs.food.posx= (Math.floor(Math.random() * (WIDTH - 10)) + 10) % 10
-      objs.food.posy= (Math.floor(Math.random() * (HEIGHT - 10)) + 10) % 10
+      objs.food.posx= (Math.floor(Math.random() * (WIDTH -10) / 10) + 1) * 10
+      objs.food.posy= (Math.floor(Math.random() * (HEIGHT - 10) / 10) + 1) * 10
     },
 
     'draw': () => {
