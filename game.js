@@ -45,8 +45,10 @@ function gameInit() {
   ctx = document.getElementById('gameScreen').getContext('2d')
   
   // Initialising control state flags
-  keystate.ver  = 0
-  keystate.hor  = 0
+  keystate.up = false
+  keystate.down = false
+  keystate.left = false
+  keystate.right = false
 
   // Initialising player object
   objs.spectator = {
@@ -64,20 +66,35 @@ function gameInit() {
 
   // TODO: Make snake object
   objs.snake = {
-    'posx': [50],
-    'posy': [50],
+    'posx': [WIDTH/2],
+    'posy': [HEIGHT/2],
     'size': 5,
 
-    'tick': (nposx, nposy) => {
-      objs.snake.posx.shift()
-      objs.snake.posx.push(nposx)
-      objs.snake.posy.shift()
-      objs.snake.posy.push(nposy)
+    'move': (dposx, dposy, sstep=true) => {
+      if (sstep) {
+        if (dposx ^ dposy == 0) {
+          throw "Invalid move parameters"
+        }
+        objs.snake.posx.shift()
+        objs.snake.posx.push(objs.snake.posx[objs.snake.posx.length - 1] + dposx * size)
+        objs.snake.posy.shift()
+        objs.snake.posy.push(objs.snake.posy[objs.snake.posy.length - 1] + dposy * size)
+      } else {
+        objs.snake.posx.shift()
+        objs.snake.posx.push(dposx)
+        objs.snake.posy.shift()
+        objs.snake.posy.push(dposy)
+      }
     },
 
-    'grow': (nposx, nposy) => {
-      objs.snake.posx.push(nposx)
-      objs.snake.posy.push(nposy)
+    'grow': (nposx, nposy, sstep=true) => {
+      if (sstep) {
+        objs.snake.posx.push(objs.snake.posx[objs.snake.posx.length - 1] + dposx * size)
+        objs.snake.posy.push(objs.snake.posy[objs.snake.posy.length - 1] + dposy * size)
+      } else {
+        objs.snake.posx.push(nposx)
+        objs.snake.posy.push(nposy)
+      }
     },
 
     'draw': () => {
@@ -95,23 +112,44 @@ function gameLoop() {
   // Main game loop
 
   // Handling user input
-  Mousetrap.bind('up', () => { keystate.ver-- })
-  Mousetrap.bind('down', () => { keystate.ver++ })
-  Mousetrap.bind('left', () => { keystate.hor-- })
-  Mousetrap.bind('right', () => { keystate.hor++ })
-  
-  // Applying signum function to keystates
-  for (let dir in keystate) {
-    if (keystate[dir] != 0) {
-      keystate[dir] = Math.sign(keystate[dir])
-    }
+  Mousetrap.bind('up', () => {
+    keystate.up = true
+    keystate.down = false
+    keystate.left = false
+    keystate.right = false
+  })
+  Mousetrap.bind('down', () => {
+    keystate.up = false
+    keystate.down = true
+    keystate.left = false
+    keystate.right = false
+  })
+  Mousetrap.bind('left', () => {
+    keystate.up = false
+    keystate.down = false
+    keystate.left = true
+    keystate.right = false
+  })
+  Mousetrap.bind('right', () => {
+    keystate.up = false
+    keystate.down = false
+    keystate.left = false
+    keystate.right = true
+  })
+
+  // Updating spectator object
+  if (keystate.up) {
+    objs.spectator.posy -= SPEED
   }
-
-  // Updating player object
-  objs.spectator.posx += (SPEED * keystate.hor)
-  objs.spectator.posy += (SPEED * keystate.ver)
-
-  // TODO: Update game objects
+  if (keystate.down) {
+    objs.spectator.posy += SPEED
+  }
+  if (keystate.left) {
+    objs.spectator.posx -= SPEED
+  }
+  if (keystate.right) {
+    objs.spectator.posx += SPEED
+  }
 
   // Clearing screen
   drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
