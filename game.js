@@ -8,6 +8,13 @@ const DEBUG = false
 let ctx
 const objs = {}
 const keystate = {}
+const gamedata = {}
+
+Number.prototype.pad = function(size) {
+  let s = String(this);
+  while (s.length < (size || 2)) {s = "0" + s;}
+  return s;
+}
 
 function drawCircle(x, y, radius, color='black', isfill=false) {
   ctx.beginPath()
@@ -40,6 +47,24 @@ function drawRectangle(x, y, w, h, color='black', isfill=false) {
   }
 }
 
+function displayGameData() {
+  document.getElementById('gameScore').textContent = `Score: ${gamedata.score}`
+
+  document.getElementById('snakeSize').textContent = `Length: ${objs.snake.posx.length}`
+
+  const timePassed = Math.round((performance.now() - gamedata.time) / 1000)
+  if (timePassed < 3600) {
+    document.getElementById('gameTime').textContent = 
+      `${Math.floor(timePassed / 60)}:` +
+      `${(timePassed % 60).pad(2)}`
+  } else {
+    document.getElementById('gameTime').textContent = 
+      `${Math.floor(timePassed / 3600)}:` +
+      `${Math.floor((timePassed % 3600) / 60).pad(2)}:` +
+      `${(timePassed % 60).pad(2)}`
+  }
+}
+
 function gameInit() {
   // Getting context from canvas element
   ctx = document.getElementById('gameScreen').getContext('2d')
@@ -51,6 +76,10 @@ function gameInit() {
   keystate.right = false
   keystate.paused = false
   keystate.pressed = false
+
+  // Initialising game data
+  gamedata.score = 0
+  gamedata.time = performance.now()
 
   // Initialising snake object
   objs.snake = {
@@ -126,6 +155,7 @@ function gameInit() {
         objs.snake.posy.push(dposy)
       }
       objs.food.generate()
+      gamedata.score += objs.snake.posx.length - 1
     },
 
     'draw': () => {
@@ -249,6 +279,9 @@ function gameLoop() {
     for (let obj in objs) {
       objs[obj].draw()
     }
+
+    // Updating game data
+    displayGameData()
   }
 
   // Looping back
