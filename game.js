@@ -73,12 +73,22 @@ function gameInit() {
       return false
     },
 
-    'canEat' : (cx, cy) => {
-      if (cx == objs.snake.posx[objs.snake.posx.length - 1] && 
-          cy == objs.snake.posy[objs.snake.posy.length - 1]) {
-        return true
+    'canEat' : (cx, cy, dposx, dposy, sstep=true) => {
+      if (sstep) {
+        const newx = objs.snake.posx[objs.snake.posx.length - 1] + dposx * objs.snake.size
+        const newy = objs.snake.posy[objs.snake.posy.length - 1] + dposy * objs.snake.size
+
+        if (cx == newx && cy == newy) {
+          return true
+        }
+        return false
+      } else {
+        if (cx == objs.snake.posx[objs.snake.posx.length - 1] && 
+            cy == objs.snake.posy[objs.snake.posy.length - 1]) {
+          return true
+        }
+        return false
       }
-      return false
     },
 
     'move': (dposx, dposy, sstep=true) => {
@@ -106,14 +116,15 @@ function gameInit() {
       }
     },
 
-    'grow': (nposx, nposy, sstep=true) => {
+    'grow': (dposx, dposy, sstep=true) => {
       if (sstep) {
         objs.snake.posx.push(objs.snake.posx[objs.snake.posx.length - 1] + dposx * objs.snake.size)
         objs.snake.posy.push(objs.snake.posy[objs.snake.posy.length - 1] + dposy * objs.snake.size)
       } else {
-        objs.snake.posx.push(nposx)
-        objs.snake.posy.push(nposy)
+        objs.snake.posx.push(dposx)
+        objs.snake.posy.push(dposy)
       }
+      objs.food.generate()
     },
 
     'draw': () => {
@@ -132,8 +143,8 @@ function gameInit() {
     'size': 8,
 
     'generate': () => {
-      objs.food.posx= (Math.floor(Math.random() * (WIDTH - 10)) + 10) % 10
-      objs.food.posy= (Math.floor(Math.random() * (HEIGHT - 10)) + 10) % 10
+      objs.food.posx= (Math.floor(Math.random() * (WIDTH -10) / 10) + 1) * 10
+      objs.food.posy= (Math.floor(Math.random() * (HEIGHT - 10) / 10) + 1) * 10
     },
 
     'draw': () => {
@@ -150,28 +161,37 @@ function gameLoop() {
 
   // Handling user input
   Mousetrap.bind('up', () => {
-    keystate.up = true
-    keystate.down = false
-    keystate.left = false
-    keystate.right = false
+    if (!keystate.down)
+    {
+      keystate.up = true
+      keystate.down = false
+      keystate.left = false
+      keystate.right = false
+    }
   })
   Mousetrap.bind('down', () => {
-    keystate.up = false
-    keystate.down = true
-    keystate.left = false
-    keystate.right = false
+    if (!keystate.up) {
+      keystate.up = false
+      keystate.down = true
+      keystate.left = false
+      keystate.right = false
+    }
   })
   Mousetrap.bind('left', () => {
-    keystate.up = false
-    keystate.down = false
-    keystate.left = true
-    keystate.right = false
+    if (!keystate.right) {
+      keystate.up = false
+      keystate.down = false
+      keystate.left = true
+      keystate.right = false
+    }
   })
   Mousetrap.bind('right', () => {
-    keystate.up = false
-    keystate.down = false
-    keystate.left = false
-    keystate.right = true
+    if (!keystate.left) {
+      keystate.up = false
+      keystate.down = false
+      keystate.left = false
+      keystate.right = true
+    }
   })
   Mousetrap.bind('space', () => {
     keystate.paused = !keystate.paused
@@ -180,17 +200,32 @@ function gameLoop() {
   if (!keystate.paused) {
     // Updating spectator object
     if (keystate.up) {
-      // objs.spectator.posy -= SPEED
-      objs.snake.move(0, -1)
+      if (objs.snake.canEat(objs.food.posx, objs.food.posy, 0, -1)) {
+        objs.snake.grow(0, -1)
+      } else {
+        objs.snake.move(0, -1)
+      }
     }
     if (keystate.down) {
-      objs.snake.move(0, 1)
+      if (objs.snake.canEat(objs.food.posx, objs.food.posy, 0, 1)) {
+        objs.snake.grow(0, 1)
+      } else {
+        objs.snake.move(0, 1)
+      }
     }
     if (keystate.left) {
-      objs.snake.move(-1, 0)
+      if (objs.snake.canEat(objs.food.posx, objs.food.posy, -1, 0)) {
+        objs.snake.grow(-1, 0)
+      } else {
+        objs.snake.move(-1, 0)
+      }
     }
     if (keystate.right) {
-      objs.snake.move(1, 0)
+      if (objs.snake.canEat(objs.food.posx, objs.food.posy, 1, 0)) {
+        objs.snake.grow(1, 0)
+      } else {
+        objs.snake.move(1, 0)
+      }
     }
 
     // Clearing screen
