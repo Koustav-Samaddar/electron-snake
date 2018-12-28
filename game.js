@@ -50,47 +50,65 @@ function gameInit() {
   keystate.left = false
   keystate.right = false
 
-  // Initialising player object
-  objs.spectator = {
-    'posx': WIDTH / 2,
-    'posy': HEIGHT / 2,
-    'size': 5,
-
-    'draw': () => {
-      drawCircle(
-        objs.spectator.posx, objs.spectator.posy, 
-        objs.spectator.size, 'grey', false
-      )
-    },
-  }
-
-  // TODO: Make snake object
+  // Initialising snake object
   objs.snake = {
     'posx': [WIDTH/2],
     'posy': [HEIGHT/2],
-    'size': 5,
+    'size': 10,
+
+    'hasCollided': (cx, cy) => {
+      if (cx > WIDTH || cy > HEIGHT) {
+        return true
+      }
+      if (cx < 0 || cy < 0) {
+        return true
+      }
+      for (let i = 0; i < objs.snake.posx.length; ++i) {
+        if (objs.snake.posx[i] == cx &&
+            objs.snake.posy[i] == cy) {
+          return true
+        }
+      }
+      return false
+    },
+
+    'canEat' : (cx, cy) => {
+      if (cx == objs.snake.posx[objs.snake.posx.length - 1] && 
+          cy == objs.snake.posy[objs.snake.posy.length - 1]) {
+        return true
+      }
+      return false
+    },
 
     'move': (dposx, dposy, sstep=true) => {
       if (sstep) {
-        if (dposx ^ dposy == 0) {
-          throw "Invalid move parameters"
+        if (dposx == dposy) {
+          throw `Invalid move parameters (${dposx}, ${dposy})`
         }
+        const newx = objs.snake.posx[objs.snake.posx.length - 1] + dposx * objs.snake.size
+        const newy = objs.snake.posy[objs.snake.posy.length - 1] + dposy * objs.snake.size
+        if (objs.snake.hasCollided(newx, newy)) {
+          throw "Game Over"
+        }
+        objs.snake.posx.push(newx)
+        objs.snake.posy.push(newy)
         objs.snake.posx.shift()
-        objs.snake.posx.push(objs.snake.posx[objs.snake.posx.length - 1] + dposx * size)
         objs.snake.posy.shift()
-        objs.snake.posy.push(objs.snake.posy[objs.snake.posy.length - 1] + dposy * size)
       } else {
-        objs.snake.posx.shift()
+        if (objs.snake.hasCollided(dposx, dposy)) {
+          throw "Game Over"
+        }
         objs.snake.posx.push(dposx)
-        objs.snake.posy.shift()
         objs.snake.posy.push(dposy)
+        objs.snake.posx.shift()
+        objs.snake.posy.shift()
       }
     },
 
     'grow': (nposx, nposy, sstep=true) => {
       if (sstep) {
-        objs.snake.posx.push(objs.snake.posx[objs.snake.posx.length - 1] + dposx * size)
-        objs.snake.posy.push(objs.snake.posy[objs.snake.posy.length - 1] + dposy * size)
+        objs.snake.posx.push(objs.snake.posx[objs.snake.posx.length - 1] + dposx * objs.snake.size)
+        objs.snake.posy.push(objs.snake.posy[objs.snake.posy.length - 1] + dposy * objs.snake.size)
       } else {
         objs.snake.posx.push(nposx)
         objs.snake.posy.push(nposy)
@@ -101,7 +119,7 @@ function gameInit() {
       for (let i = 0; i < objs.snake.posx.length; ++i) {
         drawCircle(
           objs.snake.posx[i], objs.snake.posy[i], 
-          objs.snake.size, 'green', false
+          objs.snake.size / 2, 'green', false
         )
       }
     },
@@ -139,17 +157,20 @@ function gameLoop() {
 
   // Updating spectator object
   if (keystate.up) {
-    objs.spectator.posy -= SPEED
+    // objs.spectator.posy -= SPEED
+    objs.snake.move(0, -1)
   }
   if (keystate.down) {
-    objs.spectator.posy += SPEED
+    objs.snake.move(0, 1)
   }
   if (keystate.left) {
-    objs.spectator.posx -= SPEED
+    objs.snake.move(-1, 0)
   }
   if (keystate.right) {
-    objs.spectator.posx += SPEED
+    objs.snake.move(1, 0)
   }
+
+  console.log(objs.snake)
 
   // Clearing screen
   drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
@@ -160,7 +181,7 @@ function gameLoop() {
   }
 
   // Looping back
-  setTimeout(gameLoop, 10)
+  setTimeout(gameLoop, 50)
 }
 
 function gameMain() {
