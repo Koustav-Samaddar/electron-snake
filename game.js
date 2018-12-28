@@ -124,6 +124,24 @@ function gameInit() {
       }
     },
   }
+
+  objs.food = {
+    'posx': (Math.floor(Math.random() * (WIDTH -10) / 10) + 1) * 10,
+    'posy': (Math.floor(Math.random() * (HEIGHT - 10) / 10) + 1) * 10,
+    'size': 8,
+
+    'generate': () => {
+      objs.food.posx= (Math.floor(Math.random() * (WIDTH - 10)) + 10) % 10
+      objs.food.posy= (Math.floor(Math.random() * (HEIGHT - 10)) + 10) % 10
+    },
+
+    'draw': () => {
+      drawCircle(
+        objs.food.posx, objs.food.posy,
+        objs.food.size / 2, 'red', true
+      )
+    }
+  }
 }
 
 function gameLoop() {
@@ -169,8 +187,6 @@ function gameLoop() {
   if (keystate.right) {
     objs.snake.move(1, 0)
   }
-
-  console.log(objs.snake)
 
   // Clearing screen
   drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
