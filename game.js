@@ -6,6 +6,7 @@ const SPEED = 1
 const DEBUG = false
 
 let ctx
+let munch
 const objs = {}
 const keystate = {}
 const gamedata = {}
@@ -80,6 +81,7 @@ function gameInit() {
   // Initialising game data
   gamedata.score = 0
   gamedata.time = performance.now()
+  munch = new Audio('munch.wav')
 
   // Initialising snake object
   objs.snake = {
@@ -147,6 +149,7 @@ function gameInit() {
     },
 
     'grow': (dposx, dposy, sstep=true) => {
+      munch.play()
       if (sstep) {
         objs.snake.posx.push(objs.snake.posx[objs.snake.posx.length - 1] + dposx * objs.snake.size)
         objs.snake.posy.push(objs.snake.posy[objs.snake.posy.length - 1] + dposy * objs.snake.size)
