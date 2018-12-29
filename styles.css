@@ -9,15 +9,11 @@ body {
 }
 
 .gameData {
-	border-top: 2px midnightblue;
-
-	background-color: lightblue;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 
 	font-size: 18px;
 	font-family: Verdana, Geneva, Tahoma, sans-serif;
-	color: lightseagreen;
 	font-weight: bold;
 
 	text-align: center;

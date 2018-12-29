@@ -7,6 +7,7 @@ const DEBUG = false
 
 let ctx
 let munch
+let isGameOver
 const objs = {}
 const keystate = {}
 const gamedata = {}
@@ -48,6 +49,26 @@ function drawRectangle(x, y, w, h, color='black', isfill=false) {
   }
 }
 
+function drawCenteredText(txt) {
+  ctx.font = "30px Arial"
+  ctx.fillStyle = "midnightblue";
+  ctx.textAlign = "center";
+
+  if (txt.constructor === String)
+  {
+    ctx.fillText(txt, WIDTH/2, HEIGHT/2);
+  } else {
+    ctx.fillText(txt[0], WIDTH/2, HEIGHT/2);
+    ctx.font = "16px Arial"
+
+    let tSpace = 30
+    txt.splice(1).forEach(tSmall => {
+      ctx.fillText(tSmall, WIDTH/2, HEIGHT/2 + tSpace)
+      tSpace = 16
+    })
+  }
+}
+
 function displayGameData() {
   document.getElementById('gameScore').textContent = `Score: ${gamedata.score}`
 
@@ -82,6 +103,11 @@ function gameInit() {
   gamedata.score = 0
   gamedata.time = performance.now()
   munch = new Audio('munch.wav')
+  isGameOver = false
+
+  // Setting gameData color
+  document.getElementsByClassName('gameData')[0].style['background-color'] = 'lightblue'
+  document.getElementsByClassName('gameData')[0].style['color'] = 'lightseagreen'
 
   // Initialising snake object
   objs.snake = {
@@ -198,9 +224,15 @@ function gameLoop() {
   // Main game loop
 
   // Handling user input
+  Mousetrap.bind('r', () => {
+    if (isGameOver) {
+      keystate.paused = false
+      isGameOver = false
+      gameInit()
+    }
+  })
   Mousetrap.bind('up', () => {
-    if (!keystate.down && !keystate.pressed)
-    {
+    if (!keystate.down && !keystate.pressed) {
       keystate.up = true
       keystate.down = false
       keystate.left = false
@@ -236,59 +268,75 @@ function gameLoop() {
     }
   })
   Mousetrap.bind('space', () => {
-    if (!keystate.pressed)
-    {
+    if (!keystate.pressed && !isGameOver) {
       keystate.paused = !keystate.paused
+      drawCenteredText(["PAUSED", "Press 'Space' to continue"])
     }
   })
 
   if (!keystate.paused) {
     // Updating spectator object
-    if (keystate.up) {
-      if (objs.snake.canEat(objs.food.posx, objs.food.posy, 0, -1)) {
-        objs.snake.grow(0, -1)
-      } else {
-        objs.snake.move(0, -1)
+    try {
+      if (keystate.up) {
+        if (objs.snake.canEat(objs.food.posx, objs.food.posy, 0, -1)) {
+          objs.snake.grow(0, -1)
+        } else {
+          objs.snake.move(0, -1)
+        }
       }
-    }
-    if (keystate.down) {
-      if (objs.snake.canEat(objs.food.posx, objs.food.posy, 0, 1)) {
-        objs.snake.grow(0, 1)
-      } else {
-        objs.snake.move(0, 1)
+      if (keystate.down) {
+        if (objs.snake.canEat(objs.food.posx, objs.food.posy, 0, 1)) {
+          objs.snake.grow(0, 1)
+        } else {
+          objs.snake.move(0, 1)
+        }
       }
-    }
-    if (keystate.left) {
-      if (objs.snake.canEat(objs.food.posx, objs.food.posy, -1, 0)) {
-        objs.snake.grow(-1, 0)
-      } else {
-        objs.snake.move(-1, 0)
+      if (keystate.left) {
+        if (objs.snake.canEat(objs.food.posx, objs.food.posy, -1, 0)) {
+          objs.snake.grow(-1, 0)
+        } else {
+          objs.snake.move(-1, 0)
+        }
       }
-    }
-    if (keystate.right) {
-      if (objs.snake.canEat(objs.food.posx, objs.food.posy, 1, 0)) {
-        objs.snake.grow(1, 0)
-      } else {
-        objs.snake.move(1, 0)
+      if (keystate.right) {
+        if (objs.snake.canEat(objs.food.posx, objs.food.posy, 1, 0)) {
+          objs.snake.grow(1, 0)
+        } else {
+          objs.snake.move(1, 0)
+        }
       }
+    } catch (err) {
+      gameOver()
+      isGameOver = true
+      keystate.paused = true
     }
 
     keystate.pressed = false
 
-    // Clearing screen
-    drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
+    if (!isGameOver) {
+      // Clearing screen
+      drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
 
-    // Drawing all objects
-    for (let obj in objs) {
-      objs[obj].draw()
+      // Drawing all objects
+      for (let obj in objs) {
+        objs[obj].draw()
+      }
+
+      // Updating game data
+      displayGameData()
     }
-
-    // Updating game data
-    displayGameData()
   }
 
   // Looping back
   setTimeout(gameLoop, 50)
+}
+
+function gameOver() {
+  drawCenteredText(["Game Over", "Press 'R' to restart"])
+
+  // Setting gameData color
+  document.getElementsByClassName('gameData')[0].style['background-color'] = 'cornsilk'
+  document.getElementsByClassName('gameData')[0].style['color'] = 'goldenrod'
 }
 
 function gameMain() {
