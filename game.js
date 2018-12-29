@@ -232,7 +232,7 @@ function gameLoop() {
     }
   })
   Mousetrap.bind('up', () => {
-    if (!keystate.down && !keystate.pressed) {
+    if (!keystate.down && !keystate.pressed && !isGameOver && !keystate.paused) {
       keystate.up = true
       keystate.down = false
       keystate.left = false
@@ -241,7 +241,7 @@ function gameLoop() {
     }
   })
   Mousetrap.bind('down', () => {
-    if (!keystate.up && !keystate.pressed) {
+    if (!keystate.up && !keystate.pressed && !isGameOver && !keystate.paused) {
       keystate.up = false
       keystate.down = true
       keystate.left = false
@@ -250,7 +250,7 @@ function gameLoop() {
     }
   })
   Mousetrap.bind('left', () => {
-    if (!keystate.right && !keystate.pressed) {
+    if (!keystate.right && !keystate.pressed && !isGameOver && !keystate.paused) {
       keystate.up = false
       keystate.down = false
       keystate.left = true
@@ -259,7 +259,7 @@ function gameLoop() {
     }
   })
   Mousetrap.bind('right', () => {
-    if (!keystate.left && !keystate.pressed) {
+    if (!keystate.left && !keystate.pressed && !isGameOver && !keystate.paused) {
       keystate.up = false
       keystate.down = false
       keystate.left = false
@@ -311,8 +311,6 @@ function gameLoop() {
       keystate.paused = true
     }
 
-    keystate.pressed = false
-
     if (!isGameOver) {
       // Clearing screen
       drawRectangle(0, 0, WIDTH, HEIGHT, 'white', true)
@@ -326,6 +324,9 @@ function gameLoop() {
       displayGameData()
     }
   }
+
+  // Unlocking user input
+  keystate.pressed = false
 
   // Looping back
   setTimeout(gameLoop, 50)
