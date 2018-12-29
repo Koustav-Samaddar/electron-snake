@@ -7,3 +7,26 @@ html, body {
 body {
 	overflow: hidden;
 }
+
+.gameData {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+
+	font-size: 18px;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-weight: bold;
+
+	text-align: center;
+}
+
+.gameData div {
+	padding: 10px 20px;
+}
+
+#gameScore {
+	text-align: start;
+}
+
+#gameTime {
+	text-align: end;
+}
