@@ -5,14 +5,25 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dist": "build",
+    "pack": "electron-builder --dir"
   },
   "author": "Koustav Samaddar",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.0.0"
+    "electron": "^4.0.0",
+    "electron-builder": "^20.38.4"
   },
   "dependencies": {
     "mousetrap": "^1.6.2"
-  }
+  },
+  "build": {
+    "appId": "com.koustav.electron-snake",
+    "mac": {
+      "category": "public.app-category.games",
+      "target": "dmg"
+    }
+  },
+  "postinstall": "electron-builder install-app-deps"
 }
